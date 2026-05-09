@@ -9,7 +9,7 @@
 ## 기술 스택
 - Frontend: Next.js + React + TailwindCSS
 - Backend: Node.js + Express
-- Database(예정): PostgreSQL
+- Database: PostgreSQL **(선택)** — `DATABASE_URL` 없으면 `server/data/users.json` 파일 저장소
 
 ## 실행
 ```bash
@@ -23,6 +23,26 @@ cd server
 npm install
 npm run dev
 ```
+
+### 프로덕션급 회원 저장 (PostgreSQL)
+
+로컬에서 Postgres 올리기 (프로젝트 루트):
+```bash
+docker compose up -d
+```
+
+`server/.env` 또는 환경변수에 예시:
+```
+DATABASE_URL=postgresql://oneai:oneai_dev_local@localhost:5432/oneai
+```
+
+스키마 반영:
+```bash
+cd server
+npx prisma db push
+```
+
+Render 등 클라우드에서는 **PostgreSQL 애드온** 생성 후 `DATABASE_URL`만 넣으면 동일하게 동작합니다. 미설정 시 기존처럼 파일 저장소를 사용합니다.
 
 ## 준수 원칙
 - 수익 보장 표현 금지

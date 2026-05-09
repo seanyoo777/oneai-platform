@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: oneai
+      POSTGRES_PASSWORD: oneai_dev_local
+      POSTGRES_DB: oneai
+    volumes:
+      - oneai_pg_data:/var/lib/postgresql/data
+
+volumes:
+  oneai_pg_data:

@@ -44,7 +44,7 @@ function quoteMembershipPlan(planCode) {
   };
 }
 
-function processOnchainPayment(payload) {
+async function processOnchainPayment(payload) {
   const {
     webhookSecret,
     userId,
@@ -80,7 +80,7 @@ function processOnchainPayment(payload) {
     return { ok: true, duplicated: true, message: "이미 처리된 트랜잭션입니다." };
   }
 
-  const updatedUser = extendMembershipByDays({
+  const updatedUser = await extendMembershipByDays({
     userId,
     days: quote.days,
     paymentMeta: {

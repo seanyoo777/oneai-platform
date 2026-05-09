@@ -33,7 +33,7 @@ function createRouter() {
       return;
     }
     try {
-      const user = registerUser({ email, password, nickname, referredBy: referredBy || null });
+      const user = await registerUser({ email, password, nickname, referredBy: referredBy || null });
       const token = issueUserToken(user);
       const refreshToken = issueRefreshToken(user.id);
       res.json({ ok: true, user, token, refreshToken });
@@ -45,7 +45,7 @@ function createRouter() {
   router.post("/auth/login", async (req, res) => {
     const email = String(req.body?.email ?? "").trim();
     const password = String(req.body?.password ?? "");
-    const user = authenticateUser(email, password);
+    const user = await authenticateUser(email, password);
     if (!user) {
       res.status(401).json({ ok: false, message: "이메일 또는 비밀번호가 올바르지 않습니다." });
       return;
@@ -56,7 +56,7 @@ function createRouter() {
   });
 
   router.get("/auth/me", requireUser, async (req, res) => {
-    const user = getUserById(req.user.sub);
+    const user = await getUserById(req.user.sub);
     if (!user) {
       res.status(404).json({ ok: false, message: "사용자를 찾을 수 없습니다." });
       return;
@@ -75,7 +75,7 @@ function createRouter() {
       res.status(401).json({ ok: false, message: "유효하지 않거나 만료된 refresh token입니다." });
       return;
     }
-    const user = getUserById(userId);
+    const user = await getUserById(userId);
     if (!user) {
       res.status(404).json({ ok: false, message: "사용자를 찾을 수 없습니다." });
       return;
@@ -99,7 +99,7 @@ function createRouter() {
       return;
     }
     try {
-      const user = linkWalletAddress({ userId: req.user.sub, walletAddress, walletNetwork });
+      const user = await linkWalletAddress({ userId: req.user.sub, walletAddress, walletNetwork });
       res.json({ ok: true, user });
     } catch (error) {
       res.status(400).json({ ok: false, message: error instanceof Error ? error.message : "지갑 연결 실패" });
@@ -117,7 +117,7 @@ function createRouter() {
 
   router.post("/payments/membership/webhook", async (req, res) => {
     try {
-      const result = processOnchainPayment(req.body || {});
+      const result = await processOnchainPayment(req.body || {});
       appendAuditLog({
         actor: "membership-webhook",
         eventType: "membership_auto_extend",
@@ -212,12 +212,12 @@ function createRouter() {
   });
 
   router.get("/admin/users", requireAdmin, async (_, res) => {
-    res.json(getUsers());
+    res.json(await getUsers());
   });
 
   router.patch("/admin/users/:id", requireAdmin, async (req, res) => {
     try {
-      const updated = updateUserRoleMembership({
+      const updated = await updateUserRoleMembership({
         userId: String(req.params.id),
         role: req.body?.role ? String(req.body.role) : undefined,
         membershipType: req.body?.membershipType ? String(req.body.membershipType) : undefined,

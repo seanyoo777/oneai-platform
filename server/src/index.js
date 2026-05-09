@@ -10,7 +10,11 @@ app.use(express.json());
 app.use("/api", createRouter());
 
 app.get("/health", (_, res) => {
-  res.json({ ok: true, service: "oneai-server" });
+  res.json({
+    ok: true,
+    service: "oneai-server",
+    userStorage: process.env.DATABASE_URL ? "postgresql" : "file"
+  });
 });
 
 app.listen(port, () => {

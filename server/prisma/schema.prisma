@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String    @id @default(uuid())
+  email                 String    @unique
+  passwordHash          String
+  nickname              String
+  referralCode          String    @unique
+  referredBy            String?
+  referralCount         Int       @default(0)
+  role                  String
+  membershipType        String
+  membershipExpiresAt   DateTime?
+  walletAddress         String?
+  walletNetwork         String?
+  lastMembershipPayment Json?
+  createdAt             DateTime  @default(now())
+
+  @@index([email])
+  @@index([referralCode])
+}
