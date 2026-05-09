@@ -19,6 +19,16 @@ type MeUser = {
 };
 
 const tokenKey = "oneai_user_token";
+const refreshKey = "oneai_refresh_token";
+
+async function readJsonSafe(res: Response): Promise<{ message?: string; [key: string]: unknown }> {
+  const text = await res.text();
+  try {
+    return text ? (JSON.parse(text) as { message?: string }) : {};
+  } catch {
+    return { message: text.slice(0, 200) || `HTTP ${res.status}` };
+  }
+}
 
 export function AuthPanel() {
   const [email, setEmail] = useState("");
@@ -30,36 +40,70 @@ export function AuthPanel() {
 
   async function register() {
     setMessage("");
-    const res = await fetch(`${apiBase}/api/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, nickname, referredBy })
-    });
-    const json = await res.json();
-    if (!res.ok) {
-      setMessage(json.message ?? "회원가입 실패");
-      return;
+    const payload = {
+      email: email.trim(),
+      password,
+      nickname: nickname.trim(),
+      referredBy: referredBy.trim()
+    };
+    try {
+      const res = await fetch(`${apiBase}/api/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const json = (await readJsonSafe(res)) as {
+        message?: string;
+        token?: string;
+        refreshToken?: string;
+        user?: MeUser;
+      };
+      if (!res.ok) {
+        setMessage(`${json.message ?? "회원가입 실패"} (${res.status})`);
+        return;
+      }
+      if (json.token) localStorage.setItem(tokenKey, json.token);
+      if (json.refreshToken) localStorage.setItem(refreshKey, json.refreshToken);
+      if (json.user) setMe(json.user);
+      setMessage("회원가입 완료");
+    } catch (e) {
+      setMessage(
+        e instanceof Error
+          ? `연결 실패: ${e.message}. API 주소(${apiBase})와 서버 상태를 확인하세요.`
+          : "연결 실패"
+      );
     }
-    localStorage.setItem(tokenKey, json.token);
-    setMe(json.user);
-    setMessage("회원가입 완료");
   }
 
   async function login() {
     setMessage("");
-    const res = await fetch(`${apiBase}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
-    });
-    const json = await res.json();
-    if (!res.ok) {
-      setMessage(json.message ?? "로그인 실패");
-      return;
+    try {
+      const res = await fetch(`${apiBase}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), password })
+      });
+      const json = (await readJsonSafe(res)) as {
+        message?: string;
+        token?: string;
+        refreshToken?: string;
+        user?: MeUser;
+      };
+      if (!res.ok) {
+        setMessage(`${json.message ?? "로그인 실패"} (${res.status})`);
+        return;
+      }
+      if (json.token) localStorage.setItem(tokenKey, json.token);
+      if (json.refreshToken) localStorage.setItem(refreshKey, json.refreshToken);
+      if (json.user) setMe(json.user);
+      setMessage("로그인 완료");
+    } catch (e) {
+      setMessage(
+        e instanceof Error
+          ? `연결 실패: ${e.message}. API 주소(${apiBase})와 서버 상태를 확인하세요.`
+          : "연결 실패"
+      );
     }
-    localStorage.setItem(tokenKey, json.token);
-    setMe(json.user);
-    setMessage("로그인 완료");
   }
 
   async function loadMe() {
@@ -69,16 +113,20 @@ export function AuthPanel() {
       setMessage("먼저 로그인하세요.");
       return;
     }
-    const res = await fetch(`${apiBase}/api/auth/me`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    const json = await res.json();
-    if (!res.ok) {
-      setMessage(json.message ?? "내 정보 조회 실패");
-      return;
+    try {
+      const res = await fetch(`${apiBase}/api/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const json = (await readJsonSafe(res)) as { message?: string; user?: MeUser };
+      if (!res.ok) {
+        setMessage(`${json.message ?? "내 정보 조회 실패"} (${res.status})`);
+        return;
+      }
+      if (json.user) setMe(json.user);
+      setMessage("내 정보 조회 완료");
+    } catch (e) {
+      setMessage(e instanceof Error ? `연결 실패: ${e.message}` : "연결 실패");
     }
-    setMe(json.user);
-    setMessage("내 정보 조회 완료");
   }
 
   return (
