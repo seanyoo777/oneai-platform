@@ -13,6 +13,14 @@
 
 ---
 
+## [0.3.51] - 2026-05-10
+
+### Changed
+- **`PlatformMetaProvider`** (`app/layout.tsx`): `GET /api/platform/meta` 단일 요청 후 `integrations` 공유. **`IntegrationStrip`** 은 Provider 내부에서는 재요청하지 않음(Provider 밖에서는 기존 자체 요청 폴백). 타입은 `lib/integration-flags.ts`.
+- **`docs/PLATFORM_ARCHITECTURE.md`**, **`docs/INTEGRATIONS.md`**: 클라이언트 메타 로드 방식 반영.
+
+---
+
 ## [0.3.50] - 2026-05-10
 
 ### Changed

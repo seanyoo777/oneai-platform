@@ -72,6 +72,7 @@
 ## 6. 클라이언트
 
 - 프론트는 **`lib/oneai-api.ts`** 한 진입점으로 API 베이스 URL·인증 헤더를 통일한다. 향후 여러 호스트(마켓 데이터 전용 등)로 나뉘어도 프록시/환경변수만 바꾼다.
+- 공개 메타·연동 플래그는 **`PlatformMetaProvider`**(`components/platform-meta-provider.tsx`)로 한 번 로드해 하위 UI가 재사용한다. Provider 밖에서 쓰는 `IntegrationStrip`은 예전처럼 자체 요청으로 폴백한다.
 - 로컬 개발 시 기본 베이스는 **`http://localhost:4200`** (`NEXT_PUBLIC_API_BASE_URL`) — 동일 머신에서 TetherGet(4000)·TGX(4100) 등과 포트 충돌을 피하기 위함이다.
 
 ---

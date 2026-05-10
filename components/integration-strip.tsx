@@ -1,14 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePlatformIntegrations } from "@/components/platform-meta-provider";
+import type { IntegrationFlags } from "@/lib/integration-flags";
 import { oneaiFetch } from "@/lib/oneai-api";
-
-type IntegrationFlags = {
-  coingecko?: boolean;
-  finnhubQuote?: boolean;
-  finnhubNews?: boolean;
-  yahooKospi?: boolean;
-};
 
 const ROWS: { key: keyof IntegrationFlags; label: string }[] = [
   { key: "coingecko", label: "Crypto" },
@@ -24,28 +19,37 @@ export function IntegrationStrip({
   heading?: string;
   className?: string;
 }) {
-  const [flags, setFlags] = useState<IntegrationFlags | null>(null);
-  const [error, setError] = useState(false);
+  const shared = usePlatformIntegrations();
+  const [localFlags, setLocalFlags] = useState<IntegrationFlags | null>(null);
+  const [localError, setLocalError] = useState(false);
 
   useEffect(() => {
+    if (shared !== undefined) return;
     void (async () => {
       try {
         const { res, json } = await oneaiFetch<Record<string, unknown>>("/api/platform/meta");
         if (!res.ok) {
-          setError(true);
+          setLocalError(true);
           return;
         }
         const integ = json.integrations;
         if (integ && typeof integ === "object" && !Array.isArray(integ)) {
-          setFlags(integ as IntegrationFlags);
+          setLocalFlags(integ as IntegrationFlags);
         } else {
-          setError(true);
+          setLocalError(true);
         }
       } catch {
-        setError(true);
+        setLocalError(true);
       }
     })();
-  }, []);
+  }, [shared]);
+
+  const error = shared !== undefined ? shared.error : localError;
+  const flags = shared !== undefined ? shared.integrations : localFlags;
+  const pending =
+    shared !== undefined
+      ? shared.loading && shared.integrations === null && !shared.error
+      : localFlags === null && !localError;
 
   return (
     <section
@@ -56,7 +60,7 @@ export function IntegrationStrip({
         <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-slate-500">{heading}</p>
         {error ? (
           <p className="text-xs text-slate-500">메타를 불러오지 못했습니다. API 주소를 확인해 주세요.</p>
-        ) : flags == null ? (
+        ) : pending || flags == null ? (
           <p className="text-xs text-slate-500" role="status">
             확인 중…
           </p>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { FooterNotice } from "@/components/footer-notice";
 import { MainNav } from "@/components/main-nav";
+import { PlatformMetaProvider } from "@/components/platform-meta-provider";
 import { getSiteOrigin } from "@/lib/site-origin";
 
 const siteOrigin = getSiteOrigin();
@@ -36,15 +37,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           본문으로 건너뛰기
         </a>
-        <MainNav />
-        <main
-          id="main-content"
-          tabIndex={-1}
-          className="mx-auto w-full max-w-shell px-4 py-6 pb-12 outline-none md:px-8"
-        >
-          {children}
-        </main>
-        <FooterNotice />
+        <PlatformMetaProvider>
+          <MainNav />
+          <main
+            id="main-content"
+            tabIndex={-1}
+            className="mx-auto w-full max-w-shell px-4 py-6 pb-12 outline-none md:px-8"
+          >
+            {children}
+          </main>
+          <FooterNotice />
+        </PlatformMetaProvider>
       </body>
     </html>
   );
