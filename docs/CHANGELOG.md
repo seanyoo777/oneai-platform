@@ -13,6 +13,18 @@
 
 ---
 
+## [0.3.52] - 2026-05-10
+
+### Added
+- **`lib/platform-meta-types.ts`:** `GET /api/platform/meta` 응답 타입.
+- **`usePlatformMeta()`:** 전체 메타·`features` 접근.
+- **`FooterPlatformMeta`:** 푸터에 `platformServiceId`·API 버전·서버 패키지 버전 표시.
+
+### Changed
+- **`PlatformMetaProvider`:** 전체 페이로드를 상태로 보관(`integrations`만이 아님).
+
+---
+
 ## [0.3.51] - 2026-05-10
 
 ### Changed

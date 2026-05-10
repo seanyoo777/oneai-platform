@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FooterPlatformMeta } from "@/components/footer-platform-meta";
 
 export function FooterNotice() {
   return (
@@ -32,6 +33,7 @@ export function FooterNotice() {
             본 서비스는 투자정보 및 참고용 분석 데이터를 제공하며, 투자 결과를 보장하지 않습니다. 모든 투자 판단과 책임은
             이용자에게 있습니다.
           </p>
+          <FooterPlatformMeta />
         </section>
       </div>
     </footer>
