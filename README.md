@@ -2,13 +2,13 @@
 
 모든 시장을 하나의 AI로.
 
-**현재 버전:** `0.3.41` (루트 `package.json`과 동일 · 변경 요약은 [`docs/CHANGELOG.md`](docs/CHANGELOG.md))
+**현재 버전:** `0.3.46` (루트 `package.json`과 동일 · 변경 요약은 [`docs/CHANGELOG.md`](docs/CHANGELOG.md))
 
 ## 개요
 - OneAI는 코인/국내주식/미국주식/선물/뉴스/시그널/전략 연구를 통합한 AI 기반 투자정보 플랫폼입니다.
 - 본 MVP는 더미 데이터 기반으로 동작하며, 추후 실제 API 연동이 쉽도록 데이터 수집 레이어를 분리했습니다.
 
-**개발 원칙(플랫폼·통합 생태계):** [`docs/PRINCIPLES.md`](docs/PRINCIPLES.md) · 통합 구조: [`docs/PLATFORM_ARCHITECTURE.md`](docs/PLATFORM_ARCHITECTURE.md) · **진행 기록:** [`docs/CHANGELOG.md`](docs/CHANGELOG.md) · Cursor/에이전트: [`AGENTS.md`](AGENTS.md)
+**개발 원칙(플랫폼·통합 생태계):** [`docs/PRINCIPLES.md`](docs/PRINCIPLES.md) · 통합 구조: [`docs/PLATFORM_ARCHITECTURE.md`](docs/PLATFORM_ARCHITECTURE.md) · **외부 연동·키 준비:** [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md) · **진행 기록:** [`docs/CHANGELOG.md`](docs/CHANGELOG.md) · Cursor/에이전트: [`AGENTS.md`](AGENTS.md)
 
 ## 기술 스택
 - Frontend: Next.js + React + TailwindCSS

@@ -3,7 +3,7 @@ const cors = require("cors");
 const { createRouter } = require("./router");
 const { ErrorCodes, sendError } = require("./api-response");
 const { asyncHandler } = require("./async-handler");
-const { getPlatformMeta, getPublicFeatureFlags } = require("./platform-context");
+const { getPlatformMeta, getPublicFeatureFlags, getPublicIntegrationFlags } = require("./platform-context");
 
 const app = express();
 /** 로컬 기본 4200 — TetherGet(4000)·TGX(4100) 등과 포트 충돌 방지 */
@@ -43,6 +43,7 @@ app.get("/health", asyncHandler(async (_req, res) => {
     service: "oneai-server",
     ...getPlatformMeta(),
     features: getPublicFeatureFlags(),
+    integrations: getPublicIntegrationFlags(),
     userStorage: process.env.DATABASE_URL ? "postgresql" : "file"
   };
 

@@ -13,6 +13,56 @@
 
 ---
 
+## [0.3.46] - 2026-05-10
+
+### Added
+- **`components/home-integration-strip.tsx`:** 홈에서 `GET /api/platform/meta`의 `integrations`로 외부 피드 연결 여부 표시(Crypto·KOSPI·US·News).
+
+---
+
+## [0.3.45] - 2026-05-10
+
+### Added
+- **`integrations`** 공개 플래그: `getPublicIntegrationFlags()` — `/health`·`GET /api/platform/meta`에 `coingecko`·`finnhubQuote`·`finnhubNews`·`yahooKospi` boolean.
+- **Finnhub 시장 뉴스:** `ONEAI_FINNHUB_NEWS=1` + `FINNHUB_API_KEY` 시 `GET /api/news`가 Finnhub 헤드라인 사용 (`server/src/sources/finnhub-news.js`).
+
+### Changed
+- **`server/scripts/smoke-api.js`:** `integrations` 형태 및 health/meta 일치 검증.
+
+---
+
+## [0.3.44] - 2026-05-10
+
+### Added
+- **Yahoo Chart KOSPI (`server/src/sources/yahoo-kospi.js`):** `ONEAI_YAHOO_KOSPI=1` 시 시장 요약 **KOSPI** 행을 ^KS11 메타 시세로 병합 (비공식 API · 실패 시 더미).
+
+### Removed
+- Stooq CSV 경로 — 현재 무료 다운로드에 apikey 요구로 제거.
+
+---
+
+## [0.3.43] - 2026-05-10
+
+### Added
+- **Finnhub 연동 (`server/src/sources/finnhub.js`):** `FINNHUB_API_KEY` 설정 시 시장 요약 **NASDAQ** 행을 지정 심볼(기본 `QQQ`) 시세로 병합. 타임아웃·오류 시 더미 유지.
+
+### Changed
+- **`server/src/sources/index.js`:** CoinGecko → Finnhub 순차 병합.
+- **`docs/INTEGRATIONS.md`**, **`server/.env.example`:** Finnhub 절·변수 안내.
+
+---
+
+## [0.3.42] - 2026-05-10
+
+### Added
+- **`server/src/sources/`:** 더미(`dummy.js`)와 분리된 진입점(`index.js`). 선택 시 **CoinGecko** 공개 API로 시장 요약의 **BTC·ETH** 행 병합 (`ONEAI_COINGECKO=1`). 실패·타임아웃 시 더미 폴백.
+- **`docs/INTEGRATIONS.md`:** 프로바이더 문서 링크·환경 변수·로드맵 표.
+
+### Changed
+- **`docs/PLATFORM_ARCHITECTURE.md`**, **`README.md`**, **`AGENTS.md`:** 연동 문서 및 `sources/` 경로 반영.
+
+---
+
 ## [0.3.41] - 2026-05-10
 
 ### Changed

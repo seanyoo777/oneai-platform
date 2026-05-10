@@ -24,7 +24,7 @@
 - 백엔드 진입: `server/src/index.js`, 라우트 조합 `server/src/router.js`, 도메인별 등록 `server/src/routes/*.js`
 - 플랫폼 메타: `GET /api/platform/meta` · 관리자 RBAC: `server/src/admin-auth.js`
 - 프론트 API 호출: 우선 [`lib/oneai-api.ts`](lib/oneai-api.ts) (`oneaiFetch`)로 통일
-- 데이터 소스 레이어: `server/src/sources` 등 기존 패턴 유지·확장
+- 데이터 소스 레이어: `server/src/sources/`(분리 어댑터)·[`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md) 참고
 - 회원·감사: `server/src/user-store*.js`, audit/action 관련 store — 같은 패턴으로 확장
 
 배포·스모크는 `docs/PRINCIPLES.md` 운영 절과 README를 따른다.

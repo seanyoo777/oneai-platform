@@ -52,6 +52,18 @@ function request(path) {
       console.error("FAIL /health", health.status, hj ?? health.raw);
       process.exit(1);
     }
+    const integ = hj.integrations;
+    if (
+      typeof integ !== "object" ||
+      integ === null ||
+      typeof integ.coingecko !== "boolean" ||
+      typeof integ.finnhubQuote !== "boolean" ||
+      typeof integ.finnhubNews !== "boolean" ||
+      typeof integ.yahooKospi !== "boolean"
+    ) {
+      console.error("FAIL /health integrations", hj.integrations);
+      process.exit(1);
+    }
     const meta = await request("/api/platform/meta");
     const mj = meta.json;
     if (meta.status !== 200 || !mj || mj.ok !== true) {
@@ -68,6 +80,18 @@ function request(path) {
         hj.serverPackageVersion,
         mj.serverPackageVersion
       );
+      process.exit(1);
+    }
+    const mjInt = mj.integrations;
+    if (
+      typeof mjInt !== "object" ||
+      mjInt === null ||
+      mjInt.coingecko !== integ.coingecko ||
+      mjInt.finnhubQuote !== integ.finnhubQuote ||
+      mjInt.finnhubNews !== integ.finnhubNews ||
+      mjInt.yahooKospi !== integ.yahooKospi
+    ) {
+      console.error("FAIL /health vs /api/platform/meta integrations mismatch", integ, mjInt);
       process.exit(1);
     }
     const cmsPub = await request("/api/cms/public");

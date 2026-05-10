@@ -31,9 +31,23 @@ function getPublicFeatureFlags() {
   };
 }
 
+/** 공개 조회용 — 키 존재·플래그만 노출 (값은 노출하지 않음) */
+function getPublicIntegrationFlags() {
+  const hasFinnhub = Boolean(process.env.FINNHUB_API_KEY && String(process.env.FINNHUB_API_KEY).trim());
+  const finnhubNewsOn =
+    hasFinnhub && (process.env.ONEAI_FINNHUB_NEWS === "1" || process.env.ONEAI_FINNHUB_NEWS === "true");
+  return {
+    coingecko: process.env.ONEAI_COINGECKO === "1" || process.env.ONEAI_COINGECKO === "true",
+    finnhubQuote: hasFinnhub,
+    finnhubNews: finnhubNewsOn,
+    yahooKospi: process.env.ONEAI_YAHOO_KOSPI === "1" || process.env.ONEAI_YAHOO_KOSPI === "true"
+  };
+}
+
 module.exports = {
   PLATFORM_SERVICE_ID,
   PLATFORM_API_VERSION,
   getPlatformMeta,
-  getPublicFeatureFlags
+  getPublicFeatureFlags,
+  getPublicIntegrationFlags
 };
