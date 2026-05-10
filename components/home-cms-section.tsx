@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { usePlatformMeta } from "@/components/platform-meta-provider";
 import { oneaiFetch } from "@/lib/oneai-api";
 
 type CmsItem = {
@@ -22,7 +23,7 @@ type PublicCms = {
   events?: CmsItem[];
 };
 
-type PlatformMeta = {
+type MetaGateResponse = {
   ok?: boolean;
   features?: { cms?: boolean };
 };
@@ -46,18 +47,27 @@ function LinkOrSpan({ href, children }: { href?: string | null; children: ReactN
 }
 
 export function HomeCmsSection() {
+  const pm = usePlatformMeta();
   const [cms, setCms] = useState<PublicCms | null>(null);
 
-  useEffect(() => {
-    void (async () => {
-      const meta = await oneaiFetch<PlatformMeta>("/api/platform/meta");
-      if (meta.res.ok && meta.json?.features?.cms === false) {
-        return;
-      }
-      const { res, json } = await oneaiFetch<PublicCms>("/api/cms/public");
-      if (res.ok && json && typeof json === "object") setCms(json);
-    })();
+  const loadPublicCms = useCallback(async () => {
+    const { res, json } = await oneaiFetch<PublicCms>("/api/cms/public");
+    if (res.ok && json && typeof json === "object") setCms(json);
   }, []);
+
+  useEffect(() => {
+    if (pm === undefined) {
+      void (async () => {
+        const meta = await oneaiFetch<MetaGateResponse>("/api/platform/meta");
+        if (meta.res.ok && meta.json?.features?.cms === false) return;
+        await loadPublicCms();
+      })();
+      return;
+    }
+    if (pm.loading) return;
+    if (pm.meta?.features?.cms === false) return;
+    void loadPublicCms();
+  }, [pm, loadPublicCms]);
 
   if (!cms?.ok) return null;
 

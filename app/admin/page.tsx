@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
 import { Card } from "@/components/card";
+import { AdminDeferredPanels } from "@/components/admin-deferred-panels";
 import { IntegrationStrip } from "@/components/integration-strip";
 import { PageHero } from "@/components/page-hero";
-import { AdminPanelSkeleton } from "@/components/admin-panel-skeleton";
-import { DeferredMount } from "@/components/deferred-mount";
 import { AdminRoleHint } from "@/components/admin-role-hint";
 import { AdminUsersPanel } from "@/components/admin-users-panel";
 
@@ -12,21 +10,6 @@ export const metadata: Metadata = {
   title: "관리자",
   description: "회원·CMS·전략·AI 로그 등 운영 콘솔."
 };
-
-const AdminCmsPanel = dynamic(
-  () => import("@/components/admin-cms-panel").then((m) => ({ default: m.AdminCmsPanel })),
-  { ssr: false, loading: () => <AdminPanelSkeleton label="콘텐츠 관리" /> }
-);
-
-const AdminAiRecLogPanel = dynamic(
-  () => import("@/components/admin-ai-rec-log-panel").then((m) => ({ default: m.AdminAiRecLogPanel })),
-  { ssr: false, loading: () => <AdminPanelSkeleton label="AI·시그널 로그" /> }
-);
-
-const AdminStrategyPolicyPanel = dynamic(
-  () => import("@/components/admin-strategy-policy-panel").then((m) => ({ default: m.AdminStrategyPolicyPanel })),
-  { ssr: false, loading: () => <AdminPanelSkeleton label="전략 정책" /> }
-);
 
 const adminMenus = [
   "대시보드",
@@ -84,17 +67,7 @@ export default function AdminPage() {
 
       <AdminUsersPanel />
 
-      <DeferredMount minHeight={120} idleHint="콘텐츠 관리(배너·기사 등)는 여기로 오면 불러옵니다.">
-        <AdminCmsPanel />
-      </DeferredMount>
-
-      <DeferredMount minHeight={100} idleHint="AI·시그널 서빙 로그는 스크롤 후 로드됩니다.">
-        <AdminAiRecLogPanel />
-      </DeferredMount>
-
-      <DeferredMount minHeight={120} idleHint="전략 정책·액션 이력은 스크롤 후 로드됩니다.">
-        <AdminStrategyPolicyPanel />
-      </DeferredMount>
+      <AdminDeferredPanels />
     </section>
   );
 }

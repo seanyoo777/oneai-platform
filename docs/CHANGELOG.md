@@ -13,6 +13,14 @@
 
 ---
 
+## [0.3.53] - 2026-05-10
+
+### Changed
+- **`WatchlistPanel`**, **`HomeCmsSection`:** `usePlatformMeta()`로 기능 게이트 — Provider와 동일 요청 재사용(폴백: Provider 없을 때만 기존 메타 요청).
+- **`AdminDeferredPanels`:** `features.cms`·`features.aiRecommendationLog` 가 꺼져 있으면 해당 동적 패널 대신 안내 카드 표시.
+
+---
+
 ## [0.3.52] - 2026-05-10
 
 ### Added

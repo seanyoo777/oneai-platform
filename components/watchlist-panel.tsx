@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Card } from "@/components/card";
+import { usePlatformMeta } from "@/components/platform-meta-provider";
 import { ONEAI_USER_TOKEN_KEY } from "@/lib/auth-storage";
 import { oneaiErrorHint, oneaiFetch } from "@/lib/oneai-api";
 
@@ -19,6 +20,7 @@ type PlatformMeta = {
 
 /** `/api/platform/meta` 의 features.watchlist === false 이면 패널 미표시 */
 export function WatchlistPanel({ token }: { token: string | null }) {
+  const pm = usePlatformMeta();
   const [gate, setGate] = useState<"pending" | "off" | "on">("pending");
   const [listLoading, setListLoading] = useState(false);
   const [items, setItems] = useState<WatchItem[]>([]);
@@ -28,14 +30,26 @@ export function WatchlistPanel({ token }: { token: string | null }) {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    void oneaiFetch<PlatformMeta>("/api/platform/meta").then(({ res, json }) => {
-      if (res.ok && json?.features?.watchlist === false) {
-        setGate("off");
-        return;
-      }
-      setGate("on");
-    });
-  }, []);
+    if (pm === undefined) {
+      void oneaiFetch<PlatformMeta>("/api/platform/meta").then(({ res, json }) => {
+        if (res.ok && json?.features?.watchlist === false) {
+          setGate("off");
+          return;
+        }
+        setGate("on");
+      });
+      return;
+    }
+    if (pm.loading) {
+      setGate("pending");
+      return;
+    }
+    if (pm.meta?.features?.watchlist === false) {
+      setGate("off");
+      return;
+    }
+    setGate("on");
+  }, [pm]);
 
   const load = useCallback(async () => {
     if (gate !== "on") return;
