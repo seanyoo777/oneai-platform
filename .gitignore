@@ -1,4 +1,6 @@
-﻿node_modules
+﻿.cursor/
+
+node_modules
 .next
 .env
 .env.local
@@ -7,3 +9,4 @@ server/node_modules
 server/.env
 server/data/*.json
 *.tsbuildinfo
+docs/progress-history.log

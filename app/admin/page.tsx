@@ -1,6 +1,31 @@
+import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { Card } from "@/components/card";
-import { AdminStrategyPolicyPanel } from "@/components/admin-strategy-policy-panel";
+import { PageHero } from "@/components/page-hero";
+import { AdminPanelSkeleton } from "@/components/admin-panel-skeleton";
+import { DeferredMount } from "@/components/deferred-mount";
+import { AdminRoleHint } from "@/components/admin-role-hint";
 import { AdminUsersPanel } from "@/components/admin-users-panel";
+
+export const metadata: Metadata = {
+  title: "관리자",
+  description: "회원·CMS·전략·AI 로그 등 운영 콘솔."
+};
+
+const AdminCmsPanel = dynamic(
+  () => import("@/components/admin-cms-panel").then((m) => ({ default: m.AdminCmsPanel })),
+  { ssr: false, loading: () => <AdminPanelSkeleton label="콘텐츠 관리" /> }
+);
+
+const AdminAiRecLogPanel = dynamic(
+  () => import("@/components/admin-ai-rec-log-panel").then((m) => ({ default: m.AdminAiRecLogPanel })),
+  { ssr: false, loading: () => <AdminPanelSkeleton label="AI·시그널 로그" /> }
+);
+
+const AdminStrategyPolicyPanel = dynamic(
+  () => import("@/components/admin-strategy-policy-panel").then((m) => ({ default: m.AdminStrategyPolicyPanel })),
+  { ssr: false, loading: () => <AdminPanelSkeleton label="전략 정책" /> }
+);
 
 const adminMenus = [
   "대시보드",
@@ -23,12 +48,14 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold">관리자</h1>
+    <section className="space-y-6" aria-labelledby="admin-page-title">
+      <PageHero titleId="admin-page-title" title="관리자" description="회원·CMS·전략·AI 로그 등 운영 콘솔">
+        <AdminRoleHint />
+      </PageHero>
       <Card title="관리자 메뉴">
         <ul className="grid gap-2 md:grid-cols-2">
           {adminMenus.map((menu) => (
-            <li key={menu} className="rounded-md bg-slate-900 p-3 text-sm">
+            <li key={menu} className="rounded-lg border border-slate-700/50 bg-slate-900/70 p-3 text-sm shadow-inner shadow-black/15">
               {menu}
             </li>
           ))}
@@ -48,8 +75,24 @@ export default function AdminPage() {
           ))}
         </ul>
       </Card>
+
+      <p className="text-xs text-slate-500">
+        아래 &quot;회원 관리&quot;만 첫 화면에서 바로 불러옵니다. 나머지 패널은 스크롤 시 로드되어 Render/Vercel 콜드 구간의 동시 요청을 줄입니다.
+      </p>
+
       <AdminUsersPanel />
-      <AdminStrategyPolicyPanel />
-    </div>
+
+      <DeferredMount minHeight={120} idleHint="콘텐츠 관리(배너·기사 등)는 여기로 오면 불러옵니다.">
+        <AdminCmsPanel />
+      </DeferredMount>
+
+      <DeferredMount minHeight={100} idleHint="AI·시그널 서빙 로그는 스크롤 후 로드됩니다.">
+        <AdminAiRecLogPanel />
+      </DeferredMount>
+
+      <DeferredMount minHeight={120} idleHint="전략 정책·액션 이력은 스크롤 후 로드됩니다.">
+        <AdminStrategyPolicyPanel />
+      </DeferredMount>
+    </section>
   );
 }

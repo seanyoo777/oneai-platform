@@ -1,14 +1,5 @@
-const { PrismaClient } = require("@prisma/client");
 const { hashPassword, verifyPassword, makeReferralCode } = require("./password-crypto");
-
-const globalForPrisma = globalThis;
-
-function getPrisma() {
-  if (!globalForPrisma.prisma) {
-    globalForPrisma.prisma = new PrismaClient({ log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"] });
-  }
-  return globalForPrisma.prisma;
-}
+const { getPrisma } = require("./prisma-client");
 
 function mapUser(u) {
   if (!u) return null;

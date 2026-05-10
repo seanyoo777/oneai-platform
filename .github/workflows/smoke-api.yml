@@ -1,0 +1,47 @@
+name: Server API smoke
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "server/**"
+      - ".github/workflows/smoke-api.yml"
+  pull_request:
+    paths:
+      - "server/**"
+      - ".github/workflows/smoke-api.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - name: Install & run smoke
+        run: |
+          npm ci
+          npm run start &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID 2>/dev/null || true' EXIT
+          for i in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:4200/health >/dev/null; then
+              break
+            fi
+            if [ "$i" -eq 60 ]; then
+              echo "Server did not become ready on port 4200"
+              exit 1
+            fi
+            sleep 1
+          done
+          npm run smoke

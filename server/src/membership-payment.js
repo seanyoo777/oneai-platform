@@ -1,6 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 const { extendMembershipByDays } = require("./user-store");
+const { useDatabase } = require("./db-env");
+const { getPrisma } = require("./prisma-client");
 
 const MEMBERSHIP_DEPOSIT_ADDRESS =
   process.env.ONEAI_MEMBERSHIP_DEPOSIT_ADDRESS || "0xONEAI_DEPOSIT_ADDRESS_REPLACE_ME";
@@ -29,12 +31,65 @@ function writePayments(rows) {
   fs.writeFileSync(paymentsPath, JSON.stringify(rows, null, 2), "utf8");
 }
 
+async function isTxAlreadyProcessed(txHash) {
+  if (!useDatabase()) {
+    return readPayments().some((p) => p.txHash === txHash);
+  }
+  const prisma = getPrisma();
+  const row = await prisma.membershipPayment.findUnique({ where: { txHash } });
+  return Boolean(row);
+}
+
+async function recordMembershipPayment({ txHash, userId, amountUsdt, planCode, network }) {
+  if (!useDatabase()) {
+    const payments = readPayments();
+    payments.unshift({
+      txHash,
+      userId,
+      amountUsdt: Number(amountUsdt),
+      planCode,
+      network: network || "evm",
+      processedAt: new Date().toISOString()
+    });
+    writePayments(payments.slice(0, 5000));
+    return;
+  }
+  const prisma = getPrisma();
+  try {
+    await prisma.membershipPayment.create({
+      data: {
+        txHash,
+        userId,
+        amountUsdt: Number(amountUsdt),
+        planCode,
+        network: network || "evm"
+      }
+    });
+  } catch (err) {
+    if (err && err.code === "P2002") {
+      return;
+    }
+    throw err;
+  }
+}
+
+const MEMBERSHIP_PLAN_CATALOG = {
+  vip_30d: { days: 30, amountUsdt: 100 },
+  vip_90d: { days: 90, amountUsdt: 270 },
+  vip_365d: { days: 365, amountUsdt: 960 }
+};
+
+/** 입금 주소 없이 공개 가능한 플랜 목록 (금액 단일 진실: 서버) */
+function listMembershipPlans() {
+  return Object.entries(MEMBERSHIP_PLAN_CATALOG).map(([planCode, v]) => ({
+    planCode,
+    days: v.days,
+    amountUsdt: v.amountUsdt
+  }));
+}
+
 function quoteMembershipPlan(planCode) {
-  const catalog = {
-    vip_30d: { days: 30, amountUsdt: 100 },
-    vip_90d: { days: 90, amountUsdt: 270 },
-    vip_365d: { days: 365, amountUsdt: 960 }
-  };
+  const catalog = MEMBERSHIP_PLAN_CATALOG;
   const selected = catalog[planCode] || catalog.vip_30d;
   return {
     planCode: planCode in catalog ? planCode : "vip_30d",
@@ -75,8 +130,7 @@ async function processOnchainPayment(payload) {
     throw new Error("컨펌 수 부족");
   }
 
-  const payments = readPayments();
-  if (payments.some((p) => p.txHash === txHash)) {
+  if (await isTxAlreadyProcessed(txHash)) {
     return { ok: true, duplicated: true, message: "이미 처리된 트랜잭션입니다." };
   }
 
@@ -94,15 +148,13 @@ async function processOnchainPayment(payload) {
     }
   });
 
-  payments.unshift({
+  await recordMembershipPayment({
     txHash,
     userId,
-    amountUsdt: Number(amountUsdt),
+    amountUsdt,
     planCode: quote.planCode,
-    network: network || "evm",
-    processedAt: new Date().toISOString()
+    network: network || "evm"
   });
-  writePayments(payments.slice(0, 5000));
 
   return {
     ok: true,
@@ -116,4 +168,9 @@ async function processOnchainPayment(payload) {
   };
 }
 
-module.exports = { quoteMembershipPlan, processOnchainPayment, MEMBERSHIP_DEPOSIT_ADDRESS };
+module.exports = {
+  quoteMembershipPlan,
+  listMembershipPlans,
+  processOnchainPayment,
+  MEMBERSHIP_DEPOSIT_ADDRESS
+};

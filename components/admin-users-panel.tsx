@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { Card } from "@/components/card";
+import { getPublicAdminToken } from "@/lib/admin-env";
+import { oneaiErrorHint, oneaiFetch } from "@/lib/oneai-api";
 
-const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:4000";
-const adminToken = process.env.NEXT_PUBLIC_ADMIN_TOKEN ?? "";
+const adminToken = getPublicAdminToken();
 
 type UserRow = {
   id: string;
@@ -21,55 +22,87 @@ type UserRow = {
 export function AdminUsersPanel() {
   const [users, setUsers] = useState<UserRow[]>([]);
   const [message, setMessage] = useState("");
+  const [loadingList, setLoadingList] = useState(false);
+  const [pendingUserId, setPendingUserId] = useState<string | null>(null);
   const [vipDateByUserId, setVipDateByUserId] = useState<Record<string, string>>({});
 
   async function loadUsers() {
+    setLoadingList(true);
     setMessage("");
-    const res = await fetch(`${apiBase}/api/admin/users`, {
-      headers: { Authorization: `Bearer ${adminToken}` }
-    });
-    const json = await res.json();
-    if (!res.ok) {
-      setMessage(json.message ?? "회원 목록 조회 실패");
-      return;
-    }
-    setUsers(json);
-    setVipDateByUserId((prev) => {
-      const next = { ...prev };
-      for (const u of json as UserRow[]) {
-        if (!next[u.id]) {
-          next[u.id] = u.membershipExpiresAt ? String(u.membershipExpiresAt).slice(0, 10) : "";
-        }
+    try {
+      const { res, json } = await oneaiFetch<{ users?: UserRow[] } | UserRow[]>("/api/admin/users", {
+        accessToken: adminToken || null
+      });
+      if (!res.ok) {
+        setMessage(oneaiErrorHint(json as Record<string, unknown>, res, "회원 목록 조회 실패"));
+        return;
       }
-      return next;
-    });
+      let list: UserRow[] = [];
+      if (Array.isArray(json)) {
+        list = json;
+      } else if (json && typeof json === "object" && Array.isArray(json.users)) {
+        list = json.users;
+      } else {
+        setMessage("회원 목록 응답 형식이 올바르지 않습니다.");
+        return;
+      }
+      setUsers(list);
+      setVipDateByUserId((prev) => {
+        const next = { ...prev };
+        for (const u of list) {
+          if (!next[u.id]) {
+            next[u.id] = u.membershipExpiresAt ? String(u.membershipExpiresAt).slice(0, 10) : "";
+          }
+        }
+        return next;
+      });
+    } finally {
+      setLoadingList(false);
+    }
   }
 
   async function updateUser(userId: string, role: string, membershipType: string, membershipExpiresAt: string) {
+    setPendingUserId(userId);
     setMessage("");
-    const res = await fetch(`${apiBase}/api/admin/users/${userId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${adminToken}` },
-      body: JSON.stringify({ role, membershipType, membershipExpiresAt })
-    });
-    const json = await res.json();
-    if (!res.ok) {
-      setMessage(json.message ?? "회원 수정 실패");
-      return;
+    try {
+      const { res, json } = await oneaiFetch<{ message?: string; user?: UserRow }>(
+        `/api/admin/users/${userId}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({ role, membershipType, membershipExpiresAt }),
+          accessToken: adminToken || null
+        }
+      );
+      if (!res.ok) {
+        setMessage(oneaiErrorHint(json as Record<string, unknown>, res, "회원 수정 실패"));
+        return;
+      }
+      if (!json.user?.email) {
+        setMessage("수정 응답에 사용자 정보가 없습니다.");
+        return;
+      }
+      setMessage(`수정 완료: ${json.user.email}`);
+      await loadUsers();
+    } finally {
+      setPendingUserId(null);
     }
-    setMessage(`수정 완료: ${json.user.email}`);
-    await loadUsers();
   }
 
   useEffect(() => {
     void loadUsers();
   }, []);
 
+  const rowLocked = (uid: string) => loadingList || pendingUserId === uid;
+
   return (
     <Card title="회원 관리 (실동작)">
       {!adminToken ? <p className="mb-2 text-sm text-amber-300">NEXT_PUBLIC_ADMIN_TOKEN을 설정해주세요.</p> : null}
-      {message ? <p className="mb-2 text-sm text-slate-300">{message}</p> : null}
-      <div className="space-y-2">
+      {message ? (
+        <p className="mb-2 text-sm text-slate-300" role="status" aria-live="polite">
+          {message}
+        </p>
+      ) : null}
+      <div className="space-y-2" aria-busy={loadingList}>
         {users.map((user) => (
           <div key={user.id} className="rounded-md bg-slate-900 p-3 text-sm">
             <p className="font-medium">
@@ -80,23 +113,26 @@ export function AdminUsersPanel() {
             </p>
             <div className="mt-2 flex flex-wrap gap-2">
               <button
-                className="rounded bg-slate-700 px-2 py-1 text-xs"
-                onClick={() => updateUser(user.id, "free_member", "free", "")}
+                className="rounded bg-slate-700 px-2 py-1 text-xs disabled:opacity-50"
+                disabled={rowLocked(user.id)}
+                onClick={() => void updateUser(user.id, "free_member", "free", "")}
                 type="button"
               >
                 무료회원
               </button>
               <button
-                className="rounded bg-blue-700 px-2 py-1 text-xs"
-                onClick={() => updateUser(user.id, "referral_member", "referral", "")}
+                className="rounded bg-blue-700 px-2 py-1 text-xs disabled:opacity-50"
+                disabled={rowLocked(user.id)}
+                onClick={() => void updateUser(user.id, "referral_member", "referral", "")}
                 type="button"
               >
                 레퍼럴회원
               </button>
               <button
-                className="rounded bg-yellow-700 px-2 py-1 text-xs"
+                className="rounded bg-yellow-700 px-2 py-1 text-xs disabled:opacity-50"
+                disabled={rowLocked(user.id)}
                 onClick={() =>
-                  updateUser(
+                  void updateUser(
                     user.id,
                     "vip_member",
                     "vip",
@@ -108,8 +144,11 @@ export function AdminUsersPanel() {
                 VIP 적용
               </button>
               <button
-                className="rounded bg-red-700 px-2 py-1 text-xs"
-                onClick={() => updateUser(user.id, "admin", user.membershipType, user.membershipExpiresAt || "")}
+                className="rounded bg-red-700 px-2 py-1 text-xs disabled:opacity-50"
+                disabled={rowLocked(user.id)}
+                onClick={() =>
+                  void updateUser(user.id, "admin", user.membershipType, user.membershipExpiresAt || "")
+                }
                 type="button"
               >
                 관리자
@@ -118,13 +157,17 @@ export function AdminUsersPanel() {
             <div className="mt-2 flex items-center gap-2">
               <input
                 type="date"
-                className="rounded bg-slate-800 p-1 text-xs"
+                className="rounded bg-slate-800 p-1 text-xs disabled:opacity-50"
                 value={vipDateByUserId[user.id] || ""}
+                disabled={rowLocked(user.id)}
                 onChange={(e) => setVipDateByUserId((prev) => ({ ...prev, [user.id]: e.target.value }))}
               />
               <button
-                className="rounded bg-emerald-700 px-2 py-1 text-xs"
-                onClick={() => updateUser(user.id, user.role, user.membershipType, vipDateByUserId[user.id] || "")}
+                className="rounded bg-emerald-700 px-2 py-1 text-xs disabled:opacity-50"
+                disabled={rowLocked(user.id)}
+                onClick={() =>
+                  void updateUser(user.id, user.role, user.membershipType, vipDateByUserId[user.id] || "")
+                }
                 type="button"
               >
                 만료일만 저장

@@ -1,10 +1,11 @@
 {
   "name": "oneai-server",
-  "version": "0.1.0",
+  "version": "0.3.41",
   "private": true,
   "scripts": {
     "dev": "node --watch src/index.js",
     "start": "node src/index.js",
+    "smoke": "node scripts/smoke-api.js",
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev"
@@ -12,7 +13,8 @@
   "dependencies": {
     "@prisma/client": "5.22.0",
     "cors": "2.8.5",
-    "express": "4.19.2",
+    "express": "4.21.2",
+    "express-rate-limit": "^7.5.0",
     "prisma": "5.22.0"
   }
 }

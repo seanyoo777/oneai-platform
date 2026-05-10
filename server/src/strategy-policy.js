@@ -41,12 +41,13 @@ async function adminStrategyAction({ strategyId, action, note, actor }) {
     actor: actor || "admin",
     processedAt: new Date().toISOString()
   };
-  addHistoryRow(row);
+  await addHistoryRow(row);
   return row;
 }
 
 async function getActionHistory() {
-  return readHistory().slice(0, 100);
+  const rows = await readHistory();
+  return rows.slice(0, 100);
 }
 
 module.exports = { evaluatePolicy, adminStrategyAction, getActionHistory };

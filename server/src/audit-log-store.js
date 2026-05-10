@@ -1,28 +1,18 @@
-const fs = require("fs");
-const path = require("path");
+const { useDatabase } = require("./db-env");
+const fileStore = require("./audit-log-file");
 
-const dataDir = path.join(__dirname, "..", "data");
-const filePath = path.join(dataDir, "audit-logs.json");
-
-function ensureStore() {
-  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
-  if (!fs.existsSync(filePath)) fs.writeFileSync(filePath, JSON.stringify([], null, 2), "utf8");
+function db() {
+  return require("./audit-log-prisma");
 }
 
-function readAuditLogs() {
-  ensureStore();
-  try {
-    const parsed = JSON.parse(fs.readFileSync(filePath, "utf8"));
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
+async function appendAuditLog(event) {
+  if (useDatabase()) return db().appendAuditLog(event);
+  return fileStore.appendAuditLog(event);
 }
 
-function appendAuditLog(event) {
-  const logs = readAuditLogs();
-  logs.unshift({ ...event, timestamp: new Date().toISOString() });
-  fs.writeFileSync(filePath, JSON.stringify(logs.slice(0, 5000), null, 2), "utf8");
+async function readAuditLogs() {
+  if (useDatabase()) return db().readAuditLogs();
+  return fileStore.readAuditLogs();
 }
 
-module.exports = { readAuditLogs, appendAuditLog };
+module.exports = { appendAuditLog, readAuditLogs };

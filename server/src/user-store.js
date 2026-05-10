@@ -1,8 +1,5 @@
 const fileStore = require("./user-store-file");
-
-function useDatabase() {
-  return Boolean(process.env.DATABASE_URL);
-}
+const { useDatabase } = require("./db-env");
 
 function db() {
   return require("./user-store-prisma");

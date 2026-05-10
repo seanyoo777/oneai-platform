@@ -4,8 +4,14 @@
 
 :root {
   color-scheme: dark;
+  --shell-max: 1280px;
+  --section-gap: 24px;
 }
 
 body {
-  @apply bg-oneai-navy text-white;
+  @apply min-h-screen bg-[#06080f] text-white antialiased;
+  background-image:
+    radial-gradient(ellipse 100% 70% at 50% -25%, rgba(34, 211, 238, 0.09), transparent 55%),
+    radial-gradient(ellipse 80% 50% at 100% 0%, rgba(59, 130, 246, 0.06), transparent 50%),
+    radial-gradient(ellipse 60% 45% at 0% 90%, rgba(16, 185, 129, 0.05), transparent 50%);
 }

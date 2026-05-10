@@ -8,21 +8,118 @@ datasource db {
 }
 
 model User {
-  id                    String    @id @default(uuid())
-  email                 String    @unique
+  id                    String         @id @default(uuid())
+  email                 String         @unique
   passwordHash          String
   nickname              String
-  referralCode          String    @unique
+  referralCode          String         @unique
   referredBy            String?
-  referralCount         Int       @default(0)
+  referralCount         Int            @default(0)
   role                  String
   membershipType        String
   membershipExpiresAt   DateTime?
   walletAddress         String?
   walletNetwork         String?
   lastMembershipPayment Json?
-  createdAt             DateTime  @default(now())
+  createdAt             DateTime       @default(now())
+  refreshTokens         RefreshToken[]
+  watchlistItems        WatchlistItem[]
 
   @@index([email])
   @@index([referralCode])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  actor     String
+  eventType String
+  target    String?
+  action    String?
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model StrategyAction {
+  id         String   @id @default(uuid())
+  strategyId String
+  action     String
+  note       String?
+  actor      String?
+  ok         Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  @@index([strategyId])
+  @@index([createdAt])
+}
+
+model MembershipPayment {
+  id          String   @id @default(uuid())
+  txHash      String   @unique
+  userId      String
+  amountUsdt  Float
+  planCode    String
+  network     String
+  processedAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model WatchlistItem {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  symbol    String
+  market    String
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@unique([userId, symbol, market])
+  @@index([userId])
+}
+
+// 관리자 노출 콘텐츠: 배너·기사·추천종목·이벤트 (통합 플랫폼 공개 게시 레이어)
+model SiteContent {
+  id        String    @id @default(uuid())
+  kind      String
+  sortOrder Int       @default(0)
+  published Boolean   @default(true)
+  title     String    @default("")
+  subtitle  String?
+  body      String?
+  linkUrl   String?
+  imageUrl  String?
+  badge     String?
+  meta      Json?
+  startsAt  DateTime?
+  endsAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([kind, published, sortOrder])
+}
+
+// AI·시그널 등 추천성 배치 서빙 기록 (전문 대신 summary JSON)
+model AiRecommendationLog {
+  id           String   @id @default(uuid())
+  channel      String
+  kind         String
+  summary      Json?
+  modelVersion String?
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([channel])
 }
