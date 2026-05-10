@@ -2,7 +2,7 @@
 
 모든 시장을 하나의 AI로.
 
-**현재 버전:** `0.3.54` (루트 `package.json`과 동일 · 변경 요약은 [`docs/CHANGELOG.md`](docs/CHANGELOG.md))
+**현재 버전:** `0.3.55` (루트 `package.json`과 동일 · 변경 요약은 [`docs/CHANGELOG.md`](docs/CHANGELOG.md))
 
 ## 개요
 - OneAI는 코인/국내주식/미국주식/선물/뉴스/시그널/전략 연구를 통합한 AI 기반 투자정보 플랫폼입니다.
@@ -79,11 +79,14 @@ Render 등 클라우드에서는 **PostgreSQL 애드온** 생성 후 `DATABASE_U
 - `GET /api/scan/results?type=` → `{ ok, results }`
 
 ### 서버 스모크 테스트
-`/health`(서비스명·`platformServiceId`·`apiVersion`·`serverPackageVersion`·`features`·`userStorage` 등), `/api/platform/meta`(위와 id/version/`serverPackageVersion` 일치), `/api/cms/public`, `/api/market/summary`, `/api/signals`, `/api/news`, `/api/scan/overview`, `/api/system-trading/exchanges`, `/api/system-trading/eligibility`, `/api/global-data/coverage`, `/api/research/strategy-scores`, `/api/research/strategy-policy`, `/api/scan/results?type=all`, `/api/payments/membership/catalog` (`{ ok, plans }`), 존재하지 않는 `/api/...` 경로의 **`404` + `NOT_FOUND`** 응답을 확인합니다. 호출 순서·세부 검증은 `server/scripts/smoke-api.js` 주석과 코드가 기준입니다.
+`/health`(서비스명·`platformServiceId`·`apiVersion`·`serverPackageVersion`·`features`·`userStorage` 등), `/api/platform/meta`(위와 id/version/`serverPackageVersion` 일치·`integrations` 일치·**`/health`와 `features` 객체 일치**), `/api/cms/public`, `/api/market/summary`, `/api/signals`, `/api/news`, `/api/scan/overview`, `/api/system-trading/exchanges`, `/api/system-trading/eligibility`, `/api/global-data/coverage`, `/api/research/strategy-scores`, `/api/research/strategy-policy`, `/api/scan/results?type=all`, `/api/payments/membership/catalog` (`{ ok, plans }`), 존재하지 않는 `/api/...` 경로의 **`404` + `NOT_FOUND`** 응답을 확인합니다. 호출 순서·세부 검증은 `server/scripts/smoke-api.js` 주석과 코드가 기준입니다.
 
 GitHub에 푸시·PR 시 **`.github/workflows/smoke-api.yml`**으로 API 스모크(`server/**` 등 변경 시), **`.github/workflows/next-build.yml`**으로 `lint`·`typecheck`·`next build`(`app`·`components`·`lib`·`scripts`·`.eslintrc.json` 등 변경 시)가 실행됩니다. **수동 실행(`workflow_dispatch`)**은 경로와 무관하게 항상 해당 작업을 돌릴 수 있고, **동일 브랜치 중복 실행 취소(`concurrency`)**도 적용됩니다.
 
 ```bash
+# 프로젝트 루트(server에 npm ci 했다면)
+npm run smoke
+
 cd server
 npm run smoke
 # 원격: SMOKE_API_BASE=https://your-api.example.com npm run smoke

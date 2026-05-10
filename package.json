@@ -1,6 +1,6 @@
 {
   "name": "oneai-mvp",
-  "version": "0.3.54",
+  "version": "0.3.55",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "smoke": "npm run smoke --prefix server",
     "progress": "node scripts/dev-progress-report.js",
     "progress:log": "node scripts/dev-progress-report.js --append"
   },

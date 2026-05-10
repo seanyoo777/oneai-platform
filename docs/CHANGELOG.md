@@ -13,6 +13,16 @@
 
 ---
 
+## [0.3.55] - 2026-05-10
+
+### Added
+- 루트 **`npm run smoke`** — `server` 패키지의 스모크 스크립트 호출(로컬에서 서버 기동 후 또는 `SMOKE_API_BASE` 원격 검사).
+
+### Changed
+- **`README.md`:** 스모크 검증 범위에 `/health` ↔ `/api/platform/meta`의 `features` 일치 설명 추가.
+
+---
+
 ## [0.3.54] - 2026-05-10
 
 ### Added

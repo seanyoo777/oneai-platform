@@ -1,6 +1,6 @@
 {
   "name": "oneai-server",
-  "version": "0.3.54",
+  "version": "0.3.55",
   "private": true,
   "scripts": {
     "dev": "node --watch src/index.js",
