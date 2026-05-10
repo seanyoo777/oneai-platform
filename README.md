@@ -2,7 +2,7 @@
 
 모든 시장을 하나의 AI로.
 
-**현재 버전:** `0.3.46` (루트 `package.json`과 동일 · 변경 요약은 [`docs/CHANGELOG.md`](docs/CHANGELOG.md))
+**현재 버전:** `0.3.47` (루트 `package.json`과 동일 · 변경 요약은 [`docs/CHANGELOG.md`](docs/CHANGELOG.md))
 
 ## 개요
 - OneAI는 코인/국내주식/미국주식/선물/뉴스/시그널/전략 연구를 통합한 AI 기반 투자정보 플랫폼입니다.

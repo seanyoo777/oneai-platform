@@ -3,7 +3,7 @@ import Link from "next/link";
 import { HomeCmsSection } from "@/components/home-cms-section";
 import { HomeDashboardLive } from "@/components/home-dashboard-live";
 import { HomeHero } from "@/components/home-hero";
-import { HomeIntegrationStrip } from "@/components/home-integration-strip";
+import { IntegrationStrip } from "@/components/integration-strip";
 
 export const metadata: Metadata = {
   title: "홈",
@@ -24,7 +24,7 @@ export default function HomePage() {
     <div className="flex flex-col gap-section">
       <HomeHero />
 
-      <HomeIntegrationStrip />
+      <IntegrationStrip />
 
       <nav
         aria-label="서비스 바로가기"

@@ -13,6 +13,13 @@
 
 ---
 
+## [0.3.47] - 2026-05-10
+
+### Changed
+- **`IntegrationStrip`**: 공용 컴포넌트로 분리(`components/integration-strip.tsx`). 홈·Market·News 상단에 배치 가능(`heading`·`className`).
+
+---
+
 ## [0.3.46] - 2026-05-10
 
 ### Added
