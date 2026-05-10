@@ -13,6 +13,13 @@
 
 ---
 
+## [0.3.48] - 2026-05-10
+
+### Changed
+- **`IntegrationStrip`:** Signal, Global Data, Research, Scan, Membership, Exchange, 시스템 트레이딩 페이지 상단에 동일 패턴으로 배치. `docs/INTEGRATIONS.md`에 UI 위치 안내 추가.
+
+---
+
 ## [0.3.47] - 2026-05-10
 
 ### Changed

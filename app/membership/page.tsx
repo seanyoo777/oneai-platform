@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { IntegrationStrip } from "@/components/integration-strip";
 import { MembershipPageLive } from "@/components/membership-page-live";
 
 export const metadata: Metadata = {
@@ -7,5 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function MembershipPage() {
-  return <MembershipPageLive />;
+  return (
+    <>
+      <IntegrationStrip className="mb-section" heading="Membership · live feeds" />
+      <MembershipPageLive />
+    </>
+  );
 }

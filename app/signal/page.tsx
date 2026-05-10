@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { IntegrationStrip } from "@/components/integration-strip";
 import { SignalPageLive } from "@/components/signal-page-live";
 
 export const metadata: Metadata = {
@@ -7,5 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function SignalPage() {
-  return <SignalPageLive />;
+  return (
+    <>
+      <IntegrationStrip className="mb-section" heading="Signal · live feeds" />
+      <SignalPageLive />
+    </>
+  );
 }

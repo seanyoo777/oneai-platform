@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { IntegrationStrip } from "@/components/integration-strip";
 import { GlobalDataPageLive } from "@/components/global-data-page-live";
 
 export const metadata: Metadata = {
@@ -7,5 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function GlobalDataPage() {
-  return <GlobalDataPageLive />;
+  return (
+    <>
+      <IntegrationStrip className="mb-section" heading="Global Data · live feeds" />
+      <GlobalDataPageLive />
+    </>
+  );
 }

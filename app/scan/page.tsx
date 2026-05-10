@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { IntegrationStrip } from "@/components/integration-strip";
 import { ScanPageLive } from "@/components/scan-page-live";
 
 export const metadata: Metadata = {
@@ -7,5 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function ScanPage() {
-  return <ScanPageLive />;
+  return (
+    <>
+      <IntegrationStrip className="mb-section" heading="Scan · live feeds" />
+      <ScanPageLive />
+    </>
+  );
 }

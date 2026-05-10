@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { IntegrationStrip } from "@/components/integration-strip";
 import { ResearchPageLive } from "@/components/research-page-live";
 
 export const metadata: Metadata = {
@@ -7,5 +8,10 @@ export const metadata: Metadata = {
 };
 
 export default function ResearchPage() {
-  return <ResearchPageLive />;
+  return (
+    <>
+      <IntegrationStrip className="mb-section" heading="Research · live feeds" />
+      <ResearchPageLive />
+    </>
+  );
 }
