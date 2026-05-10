@@ -13,6 +13,16 @@
 
 ---
 
+## [0.3.54] - 2026-05-10
+
+### Added
+- **`AdminRoleHint`:** `usePlatformMeta()`로 서버 `adminRbac` 플래그 한 줄 표시.
+
+### Changed
+- **`server/scripts/smoke-api.js`:** `/health`와 `GET /api/platform/meta`의 **`features` 객체 일치** 검증 추가.
+
+---
+
 ## [0.3.53] - 2026-05-10
 
 ### Changed

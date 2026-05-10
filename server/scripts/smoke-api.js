@@ -94,6 +94,19 @@ function request(path) {
       console.error("FAIL /health vs /api/platform/meta integrations mismatch", integ, mjInt);
       process.exit(1);
     }
+    const mjFeat = mj.features;
+    const hjFeat = hj.features;
+    if (
+      typeof mjFeat !== "object" ||
+      mjFeat === null ||
+      mjFeat.cms !== hjFeat.cms ||
+      mjFeat.watchlist !== hjFeat.watchlist ||
+      mjFeat.aiRecommendationLog !== hjFeat.aiRecommendationLog ||
+      mjFeat.adminRbac !== hjFeat.adminRbac
+    ) {
+      console.error("FAIL /health vs /api/platform/meta features mismatch", hjFeat, mjFeat);
+      process.exit(1);
+    }
     const cmsPub = await request("/api/cms/public");
     const cm = cmsPub.json;
     if (
