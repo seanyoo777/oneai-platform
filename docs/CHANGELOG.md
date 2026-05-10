@@ -13,6 +13,13 @@
 
 ---
 
+## [0.3.49] - 2026-05-10
+
+### Changed
+- **`/me`:** 상단에 `IntegrationStrip` (`Account · live feeds`). `docs/INTEGRATIONS.md` UI 목록에 내 정보 경로 반영.
+
+---
+
 ## [0.3.48] - 2026-05-10
 
 ### Changed
