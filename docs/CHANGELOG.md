@@ -13,6 +13,13 @@
 
 ---
 
+## [0.3.50] - 2026-05-10
+
+### Changed
+- **`IntegrationStrip`:** 관리자(`/admin`)·폼 미리보기(`/preview/auth`) 상단에 배치. 운영 중 외부 피드 메타 확인 및 프리뷰 시 API 연결 점검에 활용. `docs/INTEGRATIONS.md` 목록 갱신.
+
+---
+
 ## [0.3.49] - 2026-05-10
 
 ### Changed

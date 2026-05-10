@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Card } from "@/components/card";
 import { AuthPanel } from "@/components/auth-panel";
+import { IntegrationStrip } from "@/components/integration-strip";
 import { PageHero } from "@/components/page-hero";
 
 export const metadata: Metadata = {
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
 export default function AuthPreviewPage() {
   return (
     <section className="space-y-6" aria-labelledby="preview-auth-title">
+      <IntegrationStrip heading="Preview · live feeds" />
       <PageHero
         titleId="preview-auth-title"
         eyebrow="Preview"

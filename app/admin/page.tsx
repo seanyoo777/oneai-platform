@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { Card } from "@/components/card";
+import { IntegrationStrip } from "@/components/integration-strip";
 import { PageHero } from "@/components/page-hero";
 import { AdminPanelSkeleton } from "@/components/admin-panel-skeleton";
 import { DeferredMount } from "@/components/deferred-mount";
@@ -49,6 +50,7 @@ export default function AdminPage() {
 
   return (
     <section className="space-y-6" aria-labelledby="admin-page-title">
+      <IntegrationStrip heading="Admin · live feeds" />
       <PageHero titleId="admin-page-title" title="관리자" description="회원·CMS·전략·AI 로그 등 운영 콘솔">
         <AdminRoleHint />
       </PageHero>

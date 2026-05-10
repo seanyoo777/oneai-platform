@@ -55,7 +55,7 @@
 | `finnhubNews` | 키 있음 + `ONEAI_FINNHUB_NEWS` 활성 |
 | `yahooKospi` | `ONEAI_YAHOO_KOSPI` 활성 |
 
-프론트에서는 **`IntegrationStrip`** (`components/integration-strip.tsx`)가 홈·Market·News·Signal·Global Data·Research·Scan·Membership·내 정보(`/me`)·Exchange·시스템 트레이딩 등 페이지 상단에서 동일 필드를 Crypto·KOSPI·US·News 칩으로 표시합니다.
+프론트에서는 **`IntegrationStrip`** (`components/integration-strip.tsx`)가 홈·Market·News·Signal·Global Data·Research·Scan·Membership·내 정보(`/me`)·Exchange·시스템 트레이딩·관리자(`/admin`)·폼 미리보기(`/preview/auth`) 등 페이지 상단에서 동일 필드를 Crypto·KOSPI·US·News 칩으로 표시합니다.
 
 ### Yahoo Finance Chart — KOSPI (^KS11)
 
